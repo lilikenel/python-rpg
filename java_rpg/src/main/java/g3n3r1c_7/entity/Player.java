@@ -27,8 +27,8 @@ public class Player extends Entity {
 
     public void setDefaultValues() {
 
-        x = 100;
-        y = 100;
+        x = (gamePanel.screenWidth/2) - (gamePanel.tileSize/2);
+        y = gamePanel.screenHeight/2 - (gamePanel.tileSize/2);
         speed = 3;
         direction = DIRECTION.DOWN;
     }
