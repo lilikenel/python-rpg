@@ -24,7 +24,7 @@ public class TileManager {
 
         try {
             tile[0] = new Tile();
-            tile[0].image = ImageIO.read(new File("java_rpg/res/tiles/tile_01.png"));
+            tile[0].image = ImageIO.read(new File("java_rpg/res/tiles/tile_mud_01.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
