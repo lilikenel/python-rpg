@@ -10,15 +10,15 @@ public class Main {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		window.setTitle("java-rpg");
-		window.setLocationRelativeTo(null); //null defaults to centre
-		window.setVisible(true);
 
 		GamePanel gamePanel = new GamePanel();
 		window.add(gamePanel);
 		window.pack();
 
+		window.setLocationRelativeTo(null);
+		window.setVisible(true);
+
+		gamePanel.requestFocusInWindow();
 		gamePanel.startGameThread();
 	}
-
-	
 }

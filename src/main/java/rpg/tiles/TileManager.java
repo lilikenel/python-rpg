@@ -51,6 +51,5 @@ public class TileManager {
 				y += gamePanel.tileSize;
 			}
 		}
-
 	}
 }
