@@ -111,6 +111,6 @@ class Player:
 			self.sprite_number = 2 if self.sprite_number == 1 else 1
 			self.sprite_timer = 0.0
 
-	def draw(self, surface: pygame.Surface) -> None:
+	def draw(self, surface: pygame.Surface, camera_x: int, camera_y: int) -> None:
 		current_frame = self.frames[(self.facing_direction, self.sprite_number)]
-		surface.blit(current_frame, (round(self.x), round(self.y)))
+		surface.blit(current_frame, (round(self.x - camera_x), round(self.y - camera_y)))
