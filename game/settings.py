@@ -15,5 +15,7 @@ BACKGROUND_COLOR: tuple[int, int, int] = (0, 0, 0)
 WINDOW_TITLE: str = "python-rpg"
 
 PLAYER_SPEED: float = 180.0
+PLAYER_HITBOX_WIDTH: int = TILE_SIZE // 2
+PLAYER_HITBOX_HEIGHT: int = TILE_SIZE // 3
 
 WALK_ANIMATION_INTERVAL: float = 14.0 / 60.0

@@ -54,7 +54,7 @@ class Game:
 	def _update(self, delta_seconds: float) -> None:
 
 		pressed_keys = pygame.key.get_pressed()
-		self.player_manager.update(pressed_keys, delta_seconds)
+		self.player_manager.update(pressed_keys, delta_seconds, self.tile_manager.is_solid_at)
 		self.camera.update(self.player_manager.map_x, self.player_manager.map_y)
 
 	def _draw(self) -> None:

@@ -1,5 +1,6 @@
 from enum import Enum
 from pathlib import Path
+from typing import Callable
 
 import pygame
 
@@ -29,6 +30,18 @@ class PlayerManager:
 		self.sprite_timer: float = 0.0
 
 		self.frames: dict[tuple[Direction, int], pygame.Surface] = self._load_frames()
+
+	def _hitbox_at(self, map_x: float, map_y: float) -> pygame.Rect:
+		return pygame.Rect(
+			round(map_x + (settings.TILE_SIZE - settings.PLAYER_HITBOX_WIDTH) / 2),
+			round(map_y + settings.TILE_SIZE - settings.PLAYER_HITBOX_HEIGHT),
+			settings.PLAYER_HITBOX_WIDTH,
+			settings.PLAYER_HITBOX_HEIGHT,
+		)
+
+	@property
+	def hitbox(self) -> pygame.Rect:
+		return self._hitbox_at(self.map_x, self.map_y)
 
 	def _load_frames(self) -> dict[tuple[Direction, int], pygame.Surface]:
 
@@ -63,14 +76,14 @@ class PlayerManager:
 
 		return pygame.transform.scale(image, (settings.TILE_SIZE, settings.TILE_SIZE))
 
-	def update(self, pressed_keys: pygame.key.ScancodeWrapper, delta_seconds: float) -> None:
+	def update(self, pressed_keys: pygame.key.ScancodeWrapper, delta_seconds: float, is_solid_at: Callable[[pygame.Rect], bool]) -> None:
 
 		move_x, move_y = self._read_movement_input(pressed_keys)
 		is_moving = move_x != 0 or move_y != 0
 
 		if is_moving:
 			self._face(move_x, move_y)
-			self._move(move_x, move_y, delta_seconds)
+			self._move(move_x, move_y, delta_seconds, is_solid_at)
 			self._advance_animation(delta_seconds)
 		else:
 			self.sprite_number = 1
@@ -105,17 +118,23 @@ class PlayerManager:
 		elif move_x > 0:
 			self.facing_direction = Direction.RIGHT
 
-	def _move(self, move_x: int, move_y: int, delta_seconds: float) -> None:
+	def _move(self, move_x: int, move_y: int, delta_seconds: float, is_solid_at: Callable[[pygame.Rect], bool]) -> None:
 
 		distance = self.speed * delta_seconds
 
 		if move_x != 0 and move_y != 0:
 			diagonal_factor = 0.70710678  # 1 / sqrt(2)
-			self.map_x += move_x * distance * diagonal_factor
-			self.map_y += move_y * distance * diagonal_factor
+			new_x = self.map_x + move_x * distance * diagonal_factor
+			new_y = self.map_y + move_y * distance * diagonal_factor
 		else:
-			self.map_x += move_x * distance
-			self.map_y += move_y * distance
+			new_x = self.map_x + move_x * distance
+			new_y = self.map_y + move_y * distance
+
+		if not is_solid_at(self._hitbox_at(new_x, self.map_y)):
+			self.map_x = new_x
+
+		if not is_solid_at(self._hitbox_at(self.map_x, new_y)):
+			self.map_y = new_y
 
 	def _advance_animation(self, delta_seconds: float) -> None:
 
