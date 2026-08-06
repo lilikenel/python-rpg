@@ -4,7 +4,7 @@ from pathlib import Path
 import pygame
 
 from game import settings
-from game.camera import Camera
+from game.utils.camera import Camera
 
 
 class Direction(Enum):

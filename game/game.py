@@ -1,10 +1,14 @@
 import pygame
 
 from game import settings
-from game.camera import Camera
-from game.object_manager import ObjectManager
-from game.player_manager import PlayerManager
-from game.tile_manager import TileManager
+
+from game.utils.image_loader import ImageLoader
+from game.utils.camera import Camera
+from game.utils.map_loader import MapLoader
+
+from game.managers.object_manager import ObjectManager
+from game.managers.player_manager import PlayerManager
+from game.managers.tile_manager import TileManager
 
 
 class Game:
@@ -22,9 +26,11 @@ class Game:
 		self.is_running: bool = False
 
 		self.map_id: int = 1
-		self.tile_manager: TileManager = TileManager(self.map_id)
-		self.object_manager: ObjectManager = ObjectManager(self.map_id)
-		self.camera: Camera = Camera(self.tile_manager.map_width, self.tile_manager.map_height)
+		self.map_loader: MapLoader = MapLoader(self.map_id)
+		self.image_loader: ImageLoader = ImageLoader()
+		self.tile_manager: TileManager = TileManager(self.map_loader.tiles, self.image_loader)
+		self.object_manager: ObjectManager = ObjectManager(self.map_loader.objects, self.image_loader)
+		self.camera: Camera = Camera(self.map_loader.map_width, self.map_loader.map_height)
 		self.player_manager: PlayerManager = PlayerManager()
 
 	def run(self) -> None:
