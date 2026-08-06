@@ -12,7 +12,7 @@ FPS: int = 60
 
 BACKGROUND_COLOR: tuple[int, int, int] = (0, 0, 0)
 
-WINDOW_TITLE: str = "java-rpg"
+WINDOW_TITLE: str = "python-rpg"
 
 PLAYER_SPEED: float = 180.0
 

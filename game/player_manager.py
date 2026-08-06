@@ -4,6 +4,7 @@ from pathlib import Path
 import pygame
 
 from game import settings
+from game.camera import Camera
 
 
 class Direction(Enum):
@@ -14,11 +15,12 @@ class Direction(Enum):
 	RIGHT = "right"
 
 
-class Player:
+class PlayerManager:
 
 	def __init__(self) -> None:
-		self.x: float = (settings.SCREEN_WIDTH / 2) - (settings.TILE_SIZE / 2)
-		self.y: float = (settings.SCREEN_HEIGHT / 2) - (settings.TILE_SIZE / 2)
+
+		self.map_x: float = (settings.SCREEN_WIDTH / 2) - (settings.TILE_SIZE / 2)
+		self.map_y: float = (settings.SCREEN_HEIGHT / 2) - (settings.TILE_SIZE / 2)
 		self.speed: float = settings.PLAYER_SPEED
 
 		self.facing_direction: Direction = Direction.DOWN
@@ -29,6 +31,7 @@ class Player:
 		self.frames: dict[tuple[Direction, int], pygame.Surface] = self._load_frames()
 
 	def _load_frames(self) -> dict[tuple[Direction, int], pygame.Surface]:
+
 		filename_by_direction = {
 			Direction.UP: "back",
 			Direction.DOWN: "front",
@@ -37,25 +40,31 @@ class Player:
 		}
 
 		frames: dict[tuple[Direction, int], pygame.Surface] = {}
+
 		for direction, name in filename_by_direction.items():
 			for frame_number in (1, 2):
 				relative_path = f"res/hero/hero_{name}_0{frame_number}.png"
 				frames[(direction, frame_number)] = self._load_image(relative_path)
+
 		return frames
 
 	def _load_image(self, relative_path: str) -> pygame.Surface:
+
 		image_path = Path(relative_path)
+
 		if not image_path.is_file():
 			raise FileNotFoundError(f"Hero image not found: {image_path.resolve()}")
 
 		try:
 			image = pygame.image.load(str(image_path)).convert_alpha()
+
 		except pygame.error as error:
 			raise RuntimeError(f"Failed to load hero image {image_path}: {error}") from error
 
 		return pygame.transform.scale(image, (settings.TILE_SIZE, settings.TILE_SIZE))
 
 	def update(self, pressed_keys: pygame.key.ScancodeWrapper, delta_seconds: float) -> None:
+
 		move_x, move_y = self._read_movement_input(pressed_keys)
 		is_moving = move_x != 0 or move_y != 0
 
@@ -68,6 +77,7 @@ class Player:
 			self.sprite_timer = 0.0
 
 	def _read_movement_input(
+
 		self, pressed_keys: pygame.key.ScancodeWrapper
 	) -> tuple[int, int]:
 		move_x = 0
@@ -85,6 +95,7 @@ class Player:
 		return move_x, move_y
 
 	def _face(self, move_x: int, move_y: int) -> None:
+
 		if move_y < 0:
 			self.facing_direction = Direction.UP
 		elif move_y > 0:
@@ -95,22 +106,30 @@ class Player:
 			self.facing_direction = Direction.RIGHT
 
 	def _move(self, move_x: int, move_y: int, delta_seconds: float) -> None:
+
 		distance = self.speed * delta_seconds
 
 		if move_x != 0 and move_y != 0:
 			diagonal_factor = 0.70710678  # 1 / sqrt(2)
-			self.x += move_x * distance * diagonal_factor
-			self.y += move_y * distance * diagonal_factor
+			self.map_x += move_x * distance * diagonal_factor
+			self.map_y += move_y * distance * diagonal_factor
 		else:
-			self.x += move_x * distance
-			self.y += move_y * distance
+			self.map_x += move_x * distance
+			self.map_y += move_y * distance
 
 	def _advance_animation(self, delta_seconds: float) -> None:
+
 		self.sprite_timer += delta_seconds
+
 		if self.sprite_timer >= settings.WALK_ANIMATION_INTERVAL:
+			
 			self.sprite_number = 2 if self.sprite_number == 1 else 1
 			self.sprite_timer = 0.0
 
-	def draw(self, surface: pygame.Surface, camera_x: int, camera_y: int) -> None:
+	def draw(self, surface: pygame.Surface, camera: Camera) -> None:
+
 		current_frame = self.frames[(self.facing_direction, self.sprite_number)]
-		surface.blit(current_frame, (round(self.x - camera_x), round(self.y - camera_y)))
+
+		screen_x, screen_y = camera.apply(self.map_x, self.map_y)
+
+		surface.blit(current_frame, (round(screen_x), round(screen_y)))

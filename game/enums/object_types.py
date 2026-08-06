@@ -2,4 +2,5 @@ from enum import Enum
 
 class ObjectTypesEnum(Enum):
 	rock = 1
-	bush = 2
+	brick_wall = 2
+	bush = 3

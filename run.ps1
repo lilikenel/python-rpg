@@ -14,5 +14,5 @@ if (-not (Test-Path $venvPython)) {
 Write-Host 'Installing dependencies from requirements.txt ...'
 & $venvPython -m pip install --disable-pip-version-check -r (Join-Path $repoRoot 'requirements.txt')
 
-Write-Host 'Launching java-rpg ...'
+Write-Host 'Launching python-rpg ...'
 & $venvPython (Join-Path $repoRoot 'main.py')
